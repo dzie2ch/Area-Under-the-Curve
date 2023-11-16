@@ -1,0 +1,103 @@
+---
+title: "R code for Area Under the Curve (AUC)"
+output: html_document
+date: "2023-11-16"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#install.packages("dplyr")
+#install.packages("ggplot2")
+library(dplyr)
+library(ggplot2)
+```
+
+## Function created for finding the area under the curve (AUC)
+
+```{R, function for finding Area under the curve, echo=TRUE}
+area_under_curve <- function (x, y) {
+  
+  n <- length(y)
+  
+  res <- 0
+  
+  for (i in 1:(n-1)) {
+    
+    res <- res + ((x[i+1] - x[i]) * (y[i] + y[i+1]))
+    
+  }
+  
+  res <- res / 2
+  
+  return(res)
+}
+
+
+```
+
+### Another version of the AUC function, same effect written shorter
+
+```{R, function for finding Area under the curve2, echo =TRUE}
+
+area_under_curve2 <- function (x, y) {
+  
+  id <- order(x)
+  res <- sum(diff(x[id])* rollmean(y[id],2))
+  
+  return(res)
+  
+}
+```
+
+## Example data
+
+Made up dataframe on cows:
+
+```{r data frame}
+df <-
+tibble(
+  condition = c(1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2),
+  cow_id = c(1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2, 2),
+  x = c(1, 5, 7, 10, 3, 5, 7, 15, 1, 5, 5.5, 10, 1, 5, 7, 10),
+  y = c(2, 6, 3,  8, 2, 3, 3,  2, 5, 3, 3,  8, 2, 4, 3,  1)
+) %>%
+  group_by(condition, cow_id) %>%
+  arrange(x) %>%
+  ##an additional colulmn named auc calculated from the function above is now associated with each cow
+  mutate(auc = area_under_curve(x, y)) %>%
+  ungroup() %>%
+  mutate(cow_id = factor(cow_id), condition = factor(condition))
+```
+
+## Example plots of the data.
+
+### AUC is quantified and put at the top of each graph in Plot 1 as well as visually demonstrated in the black box
+
+### Plot 2 shows the AUC by the conditions and x, y coordinates
+
+### Plot 3 and 4 show bar graphs of the cow id dodged over condition or visversa
+
+```{r plots, echo=FALSE}
+
+Plot1 <- ggplot(data = df, aes(x = x, y = y)) +
+  geom_line() +
+  geom_area() +
+  facet_wrap(vars(cow_id, auc)) +
+  scale_y_continuous(limits = c(0, NA))
+
+
+Plot2 <- ggplot(data = df, aes(x = x, y = y, colour = cow_id)) +
+  geom_line() +
+  facet_wrap(vars(condition), labeller = label_both) +
+  scale_y_continuous(limits = c(0, NA))
+  
+
+Plot3 <- ggplot(data = df, aes(x = condition, y = auc, fill = cow_id, group = cow_id)) +
+  geom_col(position = "dodge")
+
+
+Plot4 <- ggplot(data = df, aes(x = cow_id, y = auc, fill = condition, group = condition)) +
+  geom_col(position = "dodge")
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
