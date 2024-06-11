@@ -8,8 +8,11 @@ date: "2023-11-16"
 knitr::opts_chunk$set(echo = TRUE)
 #install.packages("dplyr")
 #install.packages("ggplot2")
+install.packages("zoo")
+
 library(dplyr)
 library(ggplot2)
+library(zoo)
 ```
 
 ## Function created for finding the area under the curve (AUC)
