@@ -2,10 +2,17 @@
 R code for AUC, area under the curve
 This code was developed to look analyse ELISA assays that look at the binding of short peptide sequences, or antigens, to sera from different animals, including humans, sheep, and cows that have been diluted serially in the ELISA plate. 
 
+<img width="275" alt="image" src="https://github.com/dzie2ch/Area-Under-the-Curve/assets/94126117/dc5f8226-f21c-4add-a326-561eb5b48425">
+
+
 ## Installation
 
 install.packages("dplyr")
 install.packages("ggplot2")
+install.packages("zoo")
+library(dplyr)
+library(ggplot2)
+library(zoo)
 
 ## Usage
 
